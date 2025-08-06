@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 
 use function Laravel\Prompts\error;
@@ -30,7 +31,19 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+        $token = $user->createToken('app');
+        $input['name'] = $user->name;
+        $input['email'] = $user->email;
+        $input['token'] = $token->plainTextToken;
 
+        return response()->json([$input]);
+    }
+    public function login(Request $request)
+    {
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $user = Auth::user();
         $token = $user->createToken('app');
         $input['name'] = $user->name;
         $input['email'] = $user->email;
