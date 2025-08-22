@@ -18,66 +18,40 @@ use App\Http\Requests\StoreProductRequest;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('role:admin')->only(['store', 'update', 'destroy']);
+    }
+
     public function index()
     {
-        $products = Product::all();
-        return response()->json($products);
+        return response()->json(Product::with(['categories', 'publisher'])->get());
     }
 
-
-    /**
-     * Store lưu sản phẩm mới.
-     * Viết 1 request riêng để validate dữ liệu đầu vào.
-     */
     public function store(StoreProductRequest $request)
     {
-        $validated = $request->safe()->only([
-            'title',
-            'author',
-            'cover_image',
-            'price',
-            'description',
-            'stock'
-        ]);
-        $product = Product::create($validated);
-        return response()->json($product, 201);
+        $product = Product::create($request->validated());
+        if ($request->has('category_ids')) {
+            $product->categories()->sync($request->input('category_ids'));
+        }
+        return response()->json($product->load(['categories', 'publisher']), 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
-        $product = Product::findOrFail($id);
-        return response()->json($product);
+        return response()->json(Product::with(['categories', 'publisher'])->findOrFail($id));
     }
 
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(StoreProductRequest $request, $id)
     {
         $product = Product::findOrFail($id);
-        
-        $product->update([
-            'title' => $request->input('title'),
-            'author' => $request->input('author'),
-            'cover_image' => $request->input('cover_image'),
-            'price' => $request->input('price'),
-            'description' => $request->input('description'),
-            'stock' => $request->input('stock'),
-        ]);
-        return response()->json($product);
-
+        $product->update($request->validated());
+        if ($request->has('category_ids')) {
+            $product->categories()->sync($request->input('category_ids'));
+        }
+        return response()->json($product->load(['categories', 'publisher']));
     }
 
-    /**
-     * Hàm xóa sản phẩm theo id.
-     */
     public function destroy($id)
     {
         $product = Product::findOrFail($id);

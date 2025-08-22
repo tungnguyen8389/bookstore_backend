@@ -15,12 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('author');
-            $table->string('cover_image')->nullable();
-            $table->decimal('price', 10, 2);
             $table->text('description')->nullable();
-            $table->integer('stock')->default(0);
+            $table->string('cover_image');
+            $table->float('price');
+            $table->integer('stock');
+            $table->integer('publication_year')->nullable();
+            $table->foreignId('publisher_id')->constrained()->onDelete('cascade');
             $table->timestamps();
-            });
+        });
 
     }
 

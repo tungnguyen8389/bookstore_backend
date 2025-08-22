@@ -112,4 +112,19 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    'api' => [
+    'driver' => 'sanctum',
+    'provider' => 'users',
+],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sanctum Configuration
+    |--------------------------------------------------------------------------
+    |
+    | This section allows you to configure the Sanctum authentication guard.
+    | You can specify the driver, provider, and other settings as needed.
+    |
+    */
+
 ];

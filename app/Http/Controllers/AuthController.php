@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
 
-use function Laravel\Prompts\error;
-
 class AuthController extends Controller
 {
     public function register(Request $request)
@@ -41,7 +39,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['message' => 'Invalid email or password'], 401);
         }
         $user = Auth::user();
         $token = $user->createToken('app');
